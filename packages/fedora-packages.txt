@@ -1,0 +1,100 @@
+# Fedora Packages (DNF)
+# Essential packages for headless development environment
+
+# Core utilities
+zsh
+git
+curl
+wget
+tree
+htop
+neofetch
+jq
+ripgrep
+fd-find
+bat
+eza
+zoxide
+fzf
+tmux
+vim
+nano
+util-linux-user
+
+# Development tools and groups
+@development-tools
+nodejs
+npm
+python3
+python3-pip
+golang
+rust
+cargo
+java-11-openjdk-devel
+make
+cmake
+pkg-config
+openssl-devel
+readline-devel
+sqlite-devel
+xz-devel
+zlib-devel
+libffi-devel
+
+# Container tools
+podman
+podman-compose
+buildah
+skopeo
+
+# Terminal applications
+wezterm
+zellij
+
+# Network tools
+nmap
+telnet
+nc
+wget
+curl
+
+# System monitoring
+btop
+bandwhich
+procs
+
+# Text processing
+sed
+gawk
+grep
+coreutils
+findutils
+
+# Archive tools
+unzip
+zip
+tar
+gzip
+bzip2
+xz
+
+# Version control
+git-lfs
+
+# Cloud tools (available in Fedora repos)
+kubectl
+helm
+terraform
+
+# Additional development tools
+yarn
+pnpm
+
+# Flatpak applications
+# org.wezfurlong.wezterm
+# com.visualstudio.code
+# org.mozilla.firefox
+# org.libreoffice.LibreOffice
+# org.gimp.GIMP
+# org.videolan.VLC
+# com.google.AndroidStudio

@@ -1,0 +1,98 @@
+# macOS Packages (Homebrew)
+# Essential packages for headless development environment
+
+# Core utilities
+zsh
+git
+curl
+wget
+tree
+htop
+neofetch
+jq
+ripgrep
+fd
+bat
+eza
+zoxide
+fzf
+tmux
+vim
+nano
+
+# Development tools
+node
+python@3.11
+go
+rust
+docker
+docker-compose
+openjdk@11
+
+# Terminal applications
+wezterm
+zellij
+
+# Zsh plugins
+zsh-autosuggestions
+zsh-syntax-highlighting
+
+# Android development
+android-commandlinetools
+
+# Flutter development
+flutter
+
+# Additional development tools
+yarn
+pnpm
+make
+cmake
+pkg-config
+openssl
+readline
+sqlite3
+xz
+zlib
+libffi
+
+# Network tools
+nmap
+telnet
+netcat
+wget
+curl
+
+# System monitoring
+btop
+bandwhich
+procs
+du-dust
+
+# Text processing
+sed
+awk
+grep
+cut
+sort
+uniq
+
+# Archive tools
+unzip
+zip
+tar
+gzip
+bzip2
+xz
+
+# Version control
+git-lfs
+gh
+
+# Cloud tools
+aws-cli
+azure-cli
+gcloud
+kubectl
+helm
+terraform

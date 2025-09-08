@@ -1,13 +1,183 @@
+# Headless OS Configuration - .gitignore
+
 # Configstore
 .configstore/
 configstore/
 
-# Flutter
-.flutter/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
+# Backup files
+*.backup
+*.bak
+*.orig
+*.tmp
+
+# Local configuration files
+.zshrc.local
+.env.local
+local.conf
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.vim/
+
+# Log files
+*.log
+logs/
+
+# Cache directories
+.cache/
+node_modules/
+.npm/
+.yarn/
+.pnpm-store/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Rust cache
+target/
+Cargo.lock
+
+# Go cache
+go.sum
+vendor/
+
+# Java/Android
+*.class
+*.jar
+*.war
+*.ear
+.gradle/
 build/
-ios/Flutter/.last_build_id
+
+# Flutter/Dart
+.dart_tool/
+.packages
+pubspec.lock
+
+# SSH keys and certificates
+*.pem
+*.key
+*.crt
+*.p12
+id_rsa*
+id_ed25519*
+
+# GPG keys
+*.gpg
+*.asc
+secring.gpg
+pubring.gpg
+
+# Environment variables
+.env
+.env.production
+.env.development
+.env.test
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Compressed files
+*.zip
+*.tar.gz
+*.tgz
+*.rar
+*.7z
+
+# Package manager files
+package-lock.json
+yarn.lock
+Pipfile.lock
+poetry.lock
+Cargo.lock
+
+# Docker
+.dockerignore
+Dockerfile.local
+docker-compose.override.yml
+
+# Kubernetes
+*.kubeconfig
+kubeconfig
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+
+# Cloud provider configs
+.aws/
+.azure/
+.gcloud/
+
+# Personal files
+personal/
+private/
+secrets/
+
+# Test files
+test-output/
+coverage/
+.nyc_output/
+
+# Temporary directories
+tmp/
+temp/
+.tmp/
+
+# Installation artifacts
+install.log
+setup.log
+
+# Flutter specific
+flutter/tool_state
+
+# Zsh history (if accidentally added)
+.zsh_history
+.zhistory
+
+# Oh My Zsh cache
+.oh-my-zsh/cache/
+
+# NVM
+.nvm/versions/
+
+# Homebrew
+Brewfile.lock.json
+
+# Flatpak
+.local/share/flatpak/
+
+# RPM OSTree
+/var/lib/rpm-ostree/
+
+# System-specific configs that shouldn't be shared
+hosts
+resolv.conf
+network-scripts/
+
+# User-specific data
+.bash_history
+.python_history
+.node_repl_history
+.sqlite_history

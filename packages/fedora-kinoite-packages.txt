@@ -1,0 +1,130 @@
+# Fedora Kinoite Packages
+# rpm-ostree packages and Flatpak applications for headless development
+
+# === RPM-OSTree Packages ===
+# Core utilities
+zsh
+git
+curl
+wget
+tree
+htop
+neofetch
+jq
+ripgrep
+fd-find
+bat
+eza
+zoxide
+fzf
+tmux
+vim
+nano
+
+# Development tools
+nodejs
+npm
+python3
+python3-pip
+golang
+rust
+cargo
+java-11-openjdk-devel
+
+# Container tools (already included in Kinoite)
+podman
+podman-compose
+buildah
+skopeo
+
+# Build tools
+make
+cmake
+pkg-config
+gcc
+g++
+
+# Development libraries
+openssl-devel
+readline-devel
+sqlite-devel
+xz-devel
+zlib-devel
+libffi-devel
+
+# Network tools
+nmap
+telnet
+nc
+
+# System utilities
+util-linux-user
+coreutils
+findutils
+
+# Archive tools
+unzip
+zip
+tar
+gzip
+bzip2
+xz
+
+# Version control
+git-lfs
+
+# === Flatpak Applications ===
+# Terminal and development
+org.wezfurlong.wezterm
+com.visualstudio.code
+com.visualstudio.code.oss
+io.github.shiftey.Desktop
+
+# Browsers
+org.mozilla.firefox
+com.google.Chrome
+com.microsoft.Edge
+
+# Development tools
+com.google.AndroidStudio
+io.github.flattool.Warehouse
+com.github.tchx84.Flatseal
+
+# Office and productivity
+org.libreoffice.LibreOffice
+org.onlyoffice.desktopeditors
+
+# Media
+org.videolan.VLC
+org.audacityteam.Audacity
+org.gimp.GIMP
+
+# Communication
+com.discordapp.Discord
+com.slack.Slack
+org.telegram.desktop
+
+# System tools
+org.gnome.baobab
+org.gnome.DiskUtility
+com.mattjakeman.ExtensionManager
+
+# === Cargo Packages (if needed) ===
+# These will be installed via cargo if not available via rpm-ostree
+exa
+bat
+ripgrep
+fd-find
+zoxide
+starship
+
+# === NPM Global Packages ===
+# yarn
+# pnpm
+# @angular/cli
+# @vue/cli
+# create-react-app
+# typescript
+# ts-node
+# nodemon
+# pm2
