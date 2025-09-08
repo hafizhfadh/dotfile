@@ -130,15 +130,17 @@ install_flatpak_apps() {
     )
     
     for app in "${flatpak_apps[@]}"; do
-        if flatpak list | grep -q "$app"; then
+        if flatpak list --app | grep -q "$app"; then
             log_info "$app already installed"
         else
             log_info "Installing $app..."
-            flatpak install -y flathub "$app"
+            if ! flatpak install -y flathub "$app" 2>/dev/null; then
+                log_warning "Failed to install $app via Flatpak"
+            fi
         fi
     done
     
-    log_success "Flatpak applications installed"
+    log_success "Flatpak applications installation completed"
 }
 
 # Install Oh My Zsh
@@ -233,9 +235,11 @@ setup_android_dev() {
     log_info "Setting up Android development environment..."
     
     # Install Android Studio via Flatpak
-    if ! flatpak list | grep -q "com.google.AndroidStudio"; then
+    if ! flatpak list --app | grep -q "com.google.AndroidStudio"; then
         log_info "Installing Android Studio..."
-        flatpak install -y flathub com.google.AndroidStudio
+        if ! flatpak install -y flathub com.google.AndroidStudio 2>/dev/null; then
+            log_warning "Failed to install Android Studio via Flatpak"
+        fi
     else
         log_info "Android Studio already installed"
     fi

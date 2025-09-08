@@ -61,16 +61,37 @@ install_essentials() {
         "util-linux-user"        # For chsh command
     )
     
-    sudo dnf install -y "${packages[@]}"
-    log_success "Essential packages installed"
+    # Check which packages are already installed
+    local to_install=()
+    for package in "${packages[@]}"; do
+        if ! rpm -q "$package" >/dev/null 2>&1; then
+            to_install+=("$package")
+        else
+            log_info "$package already installed"
+        fi
+    done
+    
+    if [[ ${#to_install[@]} -gt 0 ]]; then
+        log_info "Installing packages: ${to_install[*]}"
+        sudo dnf install -y "${to_install[@]}"
+    else
+        log_info "All essential packages already installed"
+    fi
+    
+    log_success "Essential packages installation completed"
 }
 
 # Install development tools
 install_dev_tools() {
     log_info "Installing development tools..."
     
-    # Install development group
-    sudo dnf groupinstall -y "Development Tools"
+    # Check if Development Tools group is installed
+    if ! dnf group list --installed | grep -q "Development Tools"; then
+        log_info "Installing Development Tools group..."
+        sudo dnf groupinstall -y "Development Tools"
+    else
+        log_info "Development Tools group already installed"
+    fi
     
     local dev_packages=(
         "nodejs"                 # Node.js
@@ -87,8 +108,24 @@ install_dev_tools() {
         "java-11-openjdk-devel" # Java development kit
     )
     
-    sudo dnf install -y "${dev_packages[@]}"
-    log_success "Development tools installed"
+    # Check which packages are already installed
+    local to_install=()
+    for package in "${dev_packages[@]}"; do
+        if ! rpm -q "$package" >/dev/null 2>&1; then
+            to_install+=("$package")
+        else
+            log_info "$package already installed"
+        fi
+    done
+    
+    if [[ ${#to_install[@]} -gt 0 ]]; then
+        log_info "Installing development packages: ${to_install[*]}"
+        sudo dnf install -y "${to_install[@]}"
+    else
+        log_info "All development packages already installed"
+    fi
+    
+    log_success "Development tools installation completed"
 }
 
 # Setup Flatpak
@@ -115,23 +152,39 @@ setup_flatpak() {
 install_terminal_apps() {
     log_info "Installing terminal applications..."
     
-    # Try to install WezTerm from Fedora repos, fallback to Flatpak
-    if ! sudo dnf install -y wezterm 2>/dev/null; then
-        log_info "Installing WezTerm via Flatpak..."
-        flatpak install -y flathub org.wezfurlong.wezterm
-    fi
-    
-    # Install Zellij
-    if ! sudo dnf install -y zellij 2>/dev/null; then
-        log_info "Installing Zellij via cargo..."
-        if command -v cargo >/dev/null 2>&1; then
-            cargo install zellij
-        else
-            log_warning "Could not install Zellij - cargo not available"
+    # Check and install WezTerm
+    if command -v wezterm >/dev/null 2>&1; then
+        log_info "WezTerm already installed"
+    elif rpm -q wezterm >/dev/null 2>&1; then
+        log_info "WezTerm already installed via DNF"
+    elif flatpak list | grep -q "org.wezfurlong.wezterm"; then
+        log_info "WezTerm already installed via Flatpak"
+    else
+        # Try to install WezTerm from Fedora repos, fallback to Flatpak
+        if ! sudo dnf install -y wezterm 2>/dev/null; then
+            log_info "Installing WezTerm via Flatpak..."
+            flatpak install -y flathub org.wezfurlong.wezterm
         fi
     fi
     
-    log_success "Terminal applications installed"
+    # Check and install Zellij
+    if command -v zellij >/dev/null 2>&1; then
+        log_info "Zellij already installed"
+    elif rpm -q zellij >/dev/null 2>&1; then
+        log_info "Zellij already installed via DNF"
+    else
+        # Install Zellij
+        if ! sudo dnf install -y zellij 2>/dev/null; then
+            log_info "Installing Zellij via cargo..."
+            if command -v cargo >/dev/null 2>&1; then
+                cargo install zellij
+            else
+                log_warning "Could not install Zellij - cargo not available"
+            fi
+        fi
+    fi
+    
+    log_success "Terminal applications installation completed"
 }
 
 # Install Oh My Zsh
