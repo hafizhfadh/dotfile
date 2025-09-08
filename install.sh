@@ -88,30 +88,228 @@ install_dependencies() {
 setup_configs() {
     log_info "Setting up configuration files..."
     
-    # Backup existing configs
-    if [[ -f "$HOME/.zshrc" ]]; then
-        log_warning "Backing up existing .zshrc to .zshrc.backup"
-        cp "$HOME/.zshrc" "$HOME/.zshrc.backup"
-    fi
-    
-    # Copy new configs
-    cp .zshrc "$HOME/.zshrc"
-    
     # Create config directories if they don't exist
     mkdir -p "$HOME/.config"
     
-    # Copy terminal configs
-    if [[ -d "wezterm" ]]; then
-        cp -r wezterm "$HOME/.config/"
-        log_success "WezTerm configuration installed"
-    fi
+    # Setup .zshrc
+    setup_zshrc
     
-    if [[ -d "zellij" ]]; then
-        cp -r zellij "$HOME/.config/"
-        log_success "Zellij configuration installed"
-    fi
+    # Setup terminal configurations
+    setup_terminal_configs
     
     log_success "Configuration files installed"
+}
+
+# Setup .zshrc with proper backup and validation
+setup_zshrc() {
+    log_info "Setting up .zshrc configuration..."
+    
+    # Validate source file exists
+    if [[ ! -f ".zshrc" ]]; then
+        log_error "Source .zshrc file not found in current directory"
+        return 1
+    fi
+    
+    # Backup existing .zshrc with timestamp
+    if [[ -f "$HOME/.zshrc" ]]; then
+        local backup_file="$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)"
+        log_warning "Backing up existing .zshrc to $backup_file"
+        if ! cp "$HOME/.zshrc" "$backup_file"; then
+            log_error "Failed to backup existing .zshrc"
+            return 1
+        fi
+    fi
+    
+    # Copy new .zshrc
+    if cp ".zshrc" "$HOME/.zshrc"; then
+        log_success ".zshrc configuration installed"
+    else
+        log_error "Failed to install .zshrc configuration"
+        return 1
+    fi
+}
+
+# Setup terminal configurations (WezTerm and Zellij)
+setup_terminal_configs() {
+    log_info "Setting up terminal configurations..."
+    
+    # Setup WezTerm configuration
+    if [[ -d "wezterm" ]]; then
+        setup_wezterm_config
+    else
+        log_warning "WezTerm configuration directory not found, skipping"
+    fi
+    
+    # Setup Zellij configuration
+    if [[ -d "zellij" ]]; then
+        setup_zellij_config
+    else
+        log_warning "Zellij configuration directory not found, skipping"
+    fi
+}
+
+# Setup WezTerm configuration with validation
+setup_wezterm_config() {
+    log_info "Installing WezTerm configuration..."
+    
+    local wezterm_config_dir="$HOME/.config/wezterm"
+    
+    # Validate source configuration
+    if [[ ! -f "wezterm/wezterm.lua" ]]; then
+        log_error "WezTerm configuration file (wezterm.lua) not found"
+        return 1
+    fi
+    
+    # Backup existing WezTerm config
+    if [[ -d "$wezterm_config_dir" ]]; then
+        local backup_dir="$wezterm_config_dir.backup.$(date +%Y%m%d_%H%M%S)"
+        log_warning "Backing up existing WezTerm config to $backup_dir"
+        if ! mv "$wezterm_config_dir" "$backup_dir"; then
+            log_error "Failed to backup existing WezTerm configuration"
+            return 1
+        fi
+    fi
+    
+    # Copy WezTerm configuration
+    if cp -r "wezterm" "$HOME/.config/"; then
+        log_success "WezTerm configuration installed"
+        
+        # Apply platform-specific adjustments
+        apply_wezterm_platform_adjustments "$wezterm_config_dir/wezterm.lua"
+        
+        # Validate the installed configuration
+        if command -v wezterm >/dev/null 2>&1; then
+            if wezterm --config-file="$wezterm_config_dir/wezterm.lua" --version >/dev/null 2>&1; then
+                log_success "WezTerm configuration validated successfully"
+            else
+                log_warning "WezTerm configuration may have syntax errors"
+            fi
+        fi
+    else
+        log_error "Failed to install WezTerm configuration"
+        return 1
+    fi
+}
+
+# Apply platform-specific adjustments to WezTerm config
+apply_wezterm_platform_adjustments() {
+    local config_file="$1"
+    
+    if [[ ! -f "$config_file" ]]; then
+        log_error "WezTerm config file not found: $config_file"
+        return 1
+    fi
+    
+    case "$OS" in
+        "macos")
+            log_info "Applying macOS-specific WezTerm settings"
+            # macOS settings are already in the base config
+            ;;
+        "fedora"*)
+            log_info "Applying Linux-specific WezTerm settings"
+            # Disable macOS-specific settings for Linux
+            sed -i 's/config.macos_window_background_blur = 15/-- config.macos_window_background_blur = 15 -- macOS only/' "$config_file"
+            
+            # Add Linux-specific font fallbacks if needed
+            if ! grep -q "font_dirs" "$config_file"; then
+                sed -i '/config.font = wezterm.font/a\
+-- Linux font directories\nconfig.font_dirs = { "/usr/share/fonts", "/usr/local/share/fonts", "~/.local/share/fonts" }' "$config_file"
+            fi
+            ;;
+        *)
+            log_warning "Unknown OS: $OS, using default WezTerm configuration"
+            ;;
+    esac
+}
+
+# Setup Zellij configuration with validation
+setup_zellij_config() {
+    log_info "Installing Zellij configuration..."
+    
+    local zellij_config_dir="$HOME/.config/zellij"
+    
+    # Validate source configuration
+    if [[ ! -f "zellij/config.kdl" ]]; then
+        log_error "Zellij configuration file (config.kdl) not found"
+        return 1
+    fi
+    
+    # Backup existing Zellij config
+    if [[ -d "$zellij_config_dir" ]]; then
+        local backup_dir="$zellij_config_dir.backup.$(date +%Y%m%d_%H%M%S)"
+        log_warning "Backing up existing Zellij config to $backup_dir"
+        if ! mv "$zellij_config_dir" "$backup_dir"; then
+            log_error "Failed to backup existing Zellij configuration"
+            return 1
+        fi
+    fi
+    
+    # Copy Zellij configuration
+    if cp -r "zellij" "$HOME/.config/"; then
+        log_success "Zellij configuration installed"
+        
+        # Apply platform-specific adjustments
+        apply_zellij_platform_adjustments "$zellij_config_dir/config.kdl"
+        
+        # Validate the installed configuration
+        if command -v zellij >/dev/null 2>&1; then
+            # Test config syntax by running zellij setup with the config
+            if zellij setup --check >/dev/null 2>&1; then
+                log_success "Zellij configuration validated successfully"
+            else
+                log_warning "Zellij configuration may have syntax errors"
+            fi
+        fi
+    else
+        log_error "Failed to install Zellij configuration"
+        return 1
+    fi
+}
+
+# Apply platform-specific adjustments to Zellij config
+apply_zellij_platform_adjustments() {
+    local config_file="$1"
+    
+    if [[ ! -f "$config_file" ]]; then
+        log_error "Zellij config file not found: $config_file"
+        return 1
+    fi
+    
+    case "$OS" in
+        "macos")
+            log_info "Applying macOS-specific Zellij settings"
+            # Enable pbcopy for macOS
+            if ! grep -q "copy_command" "$config_file"; then
+                echo '' >> "$config_file"
+                echo '// macOS copy command' >> "$config_file"
+                echo 'copy_command "pbcopy"' >> "$config_file"
+            fi
+            ;;
+        "fedora"*)
+            log_info "Applying Linux-specific Zellij settings"
+            # Check for available copy commands and configure accordingly
+            if command -v wl-copy >/dev/null 2>&1; then
+                # Wayland
+                if ! grep -q "copy_command" "$config_file"; then
+                    echo '' >> "$config_file"
+                    echo '// Wayland copy command' >> "$config_file"
+                    echo 'copy_command "wl-copy"' >> "$config_file"
+                fi
+            elif command -v xclip >/dev/null 2>&1; then
+                # X11
+                if ! grep -q "copy_command" "$config_file"; then
+                    echo '' >> "$config_file"
+                    echo '// X11 copy command' >> "$config_file"
+                    echo 'copy_command "xclip -selection clipboard"' >> "$config_file"
+                fi
+            else
+                log_warning "No suitable copy command found for clipboard integration"
+            fi
+            ;;
+        *)
+            log_warning "Unknown OS: $OS, using default Zellij configuration"
+            ;;
+    esac
 }
 
 # Post-installation setup

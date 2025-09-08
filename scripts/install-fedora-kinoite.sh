@@ -55,7 +55,7 @@ install_rpm_ostree_packages() {
         "curl"                   # HTTP client
         "wget"                   # File downloader
         "tree"                   # Directory tree viewer
-        "htop"                   # Process viewer
+        "btop"                   # Process viewer
         "neofetch"               # System info
         "jq"                     # JSON processor
         "ripgrep"                # Fast grep alternative
@@ -74,6 +74,7 @@ install_rpm_ostree_packages() {
         "golang"                 # Go language
         "rust"                   # Rust language
         "cargo"                  # Rust package manager
+        "zellij"                 # Terminal workspace
         "podman"                 # Container runtime
         "podman-compose"         # Container orchestration
         "buildah"                # Container builder
@@ -272,6 +273,49 @@ setup_android_dev() {
     log_success "Android development environment setup completed"
 }
 
+# Install terminal applications
+install_terminal_apps() {
+    log_info "Installing terminal applications..."
+    
+    # Check and install WezTerm via Flatpak
+    if command -v wezterm >/dev/null 2>&1; then
+        log_info "WezTerm already installed"
+    elif flatpak list --app | grep -q "org.wezfurlong.wezterm"; then
+        log_info "WezTerm already installed via Flatpak"
+    else
+        log_info "Installing WezTerm via Flatpak..."
+        if ! flatpak install -y flathub org.wezfurlong.wezterm 2>/dev/null; then
+            log_warning "Failed to install WezTerm via Flatpak"
+        fi
+    fi
+    
+    # Check and install Zellij
+    if command -v zellij >/dev/null 2>&1; then
+        log_info "Zellij already installed"
+    elif rpm -q zellij >/dev/null 2>&1; then
+        log_info "Zellij already installed via rpm-ostree"
+    elif flatpak list --app | grep -q "org.zellij_developers.zellij"; then
+        log_info "Zellij already installed via Flatpak"
+    else
+        # Try to install Zellij via rpm-ostree first
+        log_info "Installing Zellij..."
+        if ! sudo rpm-ostree install zellij 2>/dev/null; then
+            # Fallback to cargo if available
+            if command -v cargo >/dev/null 2>&1; then
+                log_info "Installing Zellij via cargo..."
+                cargo install --locked zellij
+            else
+                log_warning "Could not install Zellij - neither rpm-ostree nor cargo available"
+                log_info "You can install Zellij manually after reboot using: sudo rpm-ostree install zellij"
+            fi
+        else
+            log_warning "Zellij installed via rpm-ostree. Reboot required to apply changes."
+        fi
+    fi
+    
+    log_success "Terminal applications installation completed"
+}
+
 # Setup Flutter development
 setup_flutter_dev() {
     if [[ ! -d "$HOME/Development/flutter" ]]; then
@@ -296,6 +340,7 @@ main() {
     install_rpm_ostree_packages
     setup_flatpak
     install_flatpak_apps
+    install_terminal_apps
     install_oh_my_zsh
     install_zsh_plugins
     install_nvm
