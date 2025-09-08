@@ -80,22 +80,38 @@ install_rpm_ostree_packages() {
         "skopeo"                 # Container image utility
     )
     
-    # Check which packages are already installed
+    # Check which packages are already installed or provided
     local to_install=()
     for package in "${packages[@]}"; do
-        if ! rpm -q "$package" >/dev/null 2>&1; then
-            to_install+=("$package")
-        else
+        # Check if package is installed
+        if rpm -q "$package" >/dev/null 2>&1; then
             log_info "$package already installed"
+        # Check if package is provided by another package (for conflicts like wget)
+        elif rpm -q --whatprovides "$package" >/dev/null 2>&1; then
+            log_info "$package already provided by system"
+        # Check if command is available (for packages that might be built-in)
+        elif command -v "$package" >/dev/null 2>&1; then
+            log_info "$package command already available"
+        else
+            to_install+=("$package")
         fi
     done
     
     if [[ ${#to_install[@]} -gt 0 ]]; then
         log_info "Installing packages: ${to_install[*]}"
-        sudo rpm-ostree install "${to_install[@]}"
+        if ! sudo rpm-ostree install "${to_install[@]}" 2>/dev/null; then
+            log_warning "Some packages failed to install. Trying individually..."
+            for pkg in "${to_install[@]}"; do
+                if ! sudo rpm-ostree install "$pkg" 2>/dev/null; then
+                    log_warning "Failed to install $pkg (may already be provided or conflict)"
+                else
+                    log_info "Successfully installed $pkg"
+                fi
+            done
+        fi
         log_warning "System packages installed. Reboot required to apply changes."
     else
-        log_info "All essential packages already installed"
+        log_info "All essential packages already installed or provided"
     fi
     
     log_success "rpm-ostree package installation completed"
